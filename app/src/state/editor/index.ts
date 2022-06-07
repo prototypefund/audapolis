@@ -10,6 +10,7 @@ import {
   reassignParagraph,
   renameSpeaker,
   deleteSomething,
+  filterContent,
 } from './edit';
 
 import { finishTranscriptCorrection } from './transcript_correction';
@@ -65,6 +66,7 @@ const stateSlice: Reducer<StateWithHistory<EditorState | null>> = undoable(edito
     renameSpeaker.type,
     paste.fulfilled.type,
     finishTranscriptCorrection.type,
+    filterContent.type,
   ]),
   ignoreInitialState: false,
   syncFilter: true,

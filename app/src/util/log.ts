@@ -4,6 +4,7 @@ import path from 'path';
 import JSZip from 'jszip';
 import { getHomePath, saveFile } from '../../ipc/ipc_renderer';
 import { isRunningInTest } from './index';
+import glob from 'glob';
 
 enum LogLevel {
   Log,
@@ -42,7 +43,13 @@ export function initLog(suffix: string): void {
   if (!fs.existsSync(log_dir)) {
     fs.mkdirSync(log_dir, { recursive: true });
   }
-  const fileName = new Date().getTime() + `_${suffix}.log`;
+  const now = new Date();
+  for (const oldLogfile of glob.sync(path.join(log_dir, `*_${suffix}.log`))) {
+    if (now.getTime() - fs.statSync(oldLogfile).mtime.getTime() > 5 * 24 * 60 * 60 * 1000) {
+      fs.rmSync(oldLogfile);
+    }
+  }
+  const fileName = now.getTime().toString() + `_${suffix}.log`;
   logFilePath = path.join(log_dir, fileName);
   const file = fs.openSync(logFilePath, 'w');
   console.log('Init logging into', logFilePath);
